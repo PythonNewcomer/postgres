@@ -1,1 +1,1 @@
-# postgres
+# This is a project created to learn postgres
