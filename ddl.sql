@@ -59,14 +59,14 @@ $$
 language plpgsql;
 
 create or replace function cinema.insert_movie(movie varchar(255), year_ int, length_ int, country_id int,  --this function inserts movie and returns its id
-									  rating numeric(2,1), budget int) 
+									  rating numeric(2,1), budget int, actors json) 
 returns int 
 as $$
 declare
 	a_id int;
 begin
-	insert into cinema.movies(title, year_of_release, length_in_minutes, country_id, imdb_rating, budget)
-	values(movie, year_, length_, country_id, rating, budget)
+	insert into cinema.movies(title, year_of_release, length_in_minutes, country_id, imdb_rating, budget, actors)
+	values(movie, year_, length_, country_id, rating, budget, actors)
 	returning id into a_id;
 	return a_id;
 end; 
