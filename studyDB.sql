@@ -91,7 +91,7 @@ values
 create table cinema.genre_movie_show(
 	id serial primary key,
 	genre_id int references cinema.genres(id) not null,
-	movie_show_id int references cinema.movies(id) not null
+	movie_show_id int not null
 );
 
 create or replace function cinema.return_movie_show_id(name varchar(255)) 
@@ -322,9 +322,9 @@ select cinema.insert_movie('Dangal', 2016, 161, 8, 8.5, 10500000); -- function i
 
 insert into cinema.genre_movie_show(movie_show_id, genre_id) -- we insert movie and genres to which it belongs into table cinema.genre_movie_show;
 values
-	(select cinema.return_movie_show_id('Dangal'),1),
-	(select cinema.return_movie_show_id('Dangal'),5),
-	(select cinema.return_movie_show_id('Dangal'),11);
+	(cinema.return_movie_show_id('Dangal'),1),
+	(cinema.return_movie_show_id('Dangal'),5),
+	(cinema.return_movie_show_id('Dangal'),11);
 
 select * 
 from cinema.log_table; -- trigger reacted on insert command and logged changes into table cinema.log_table;
