@@ -124,3 +124,51 @@ values
 	(cinema.return_movie_show_id('Dangal'),1),
 	(cinema.return_movie_show_id('Dangal'),5),
 	(cinema.return_movie_show_id('Dangal'),11);
+
+update cinema.movies
+set actors = '{"Leading actors":{  
+      "Tim Robbins":{"age":60, "role":"Andy Dufresne"},
+      "Morgan Freeman":{"age":81, "role":"Ellis Boyd ''Red'' Redding"}
+	  },
+"Supporting actors":{  
+      "Clancy Brown":{"age":59, "role":"Captain Hadley"},
+      "Gil Bellows":{"age":59, "role":"Tommy"}
+	  }
+}'
+where id = 1;
+
+update cinema.movies
+set actors = ('{"Leading actors":{  
+      "Christian Bale":{"age":44, "role":"Bruce Wayne"},
+      "Heath Ledger":{"age":39, "role":"Joker"}
+	  },
+"Supporting actors":{  
+      "Michael Caine":{"age":85, "role":"Alfred"},
+      "Maggie Gyllenhaal":{"age":41, "role":"Rachel"}
+	  }
+}')
+where id = 4;
+
+update cinema.movies
+set actors = ('{"Leading actors":{  
+      "Liam Neeson":{"age":66, "role":"Oskar Schindler"},
+      "Ralph Fiennes":{"age":56, "role":"Amon Goeth"}
+	  },
+"Supporting actors":{  
+      "Caroline Goodall":{"age":59, "role":"Emilie Schindler"},
+      "Jonathan Sagall":{"age":59, "role":"Poldek Pfefferberg"}
+	  }
+}')
+where id = 6;
+
+update cinema.movies
+set actors = ('{"Leading actors":{  
+      "François Cluzet":{"age":63, "role":"Philippe"},
+      "Omar Sy":{"age":40, "role":"Driss"}
+	  },
+"Supporting actors":{  
+      "Anne Le Ny":{"age":40, "role":"Yvonne"},
+      "Audrey Fleurot":{"age":41, "role":"Magalie"}
+	  }
+}')
+where id = 13;
