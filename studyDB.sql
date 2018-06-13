@@ -36,10 +36,13 @@ values
 	('Brazil'),
 	('Germany'),
 	('South Korea'),
-	('India');
+	('India'),
+	('UK');
 
+create sequence if not exists next_movie_id;
+	
 create table cinema.movies(
-	id serial primary key,
+	id int default nextval('next_movie_id') primary key,
 	title varchar(255) not null unique,
 	year_of_release int not null,
 	length_in_minutes int not null,
@@ -68,51 +71,96 @@ values
 	('The Lives of Others', 2006, 137, 6, 8.4,2000000),
 	('Oldeuboi', 2003, 120, 7, 8.4, 3000000);
 
-create table cinema.movie_genre(
+	
+create table cinema.tv_shows(
+	id int default nextval('next_movie_id') primary key,
+	title varchar(255) not null unique,
+	year_of_release int not null,
+	length_in_minutes int not null,
+	country_id int references cinema.country(id) not null,
+	imdb_rating numeric (2, 1)  default  0.0,
+	budget int not null
+);
+	
+insert into cinema.tv_shows(title, year_of_release, length_in_minutes, country_id, imdb_rating, budget)
+values
+	('Band of Brothers', 2001, 594, 1, 9.5, 125000000),
+	('Game of Thrones', 2011, 3300, 9, 9.5, 500000000),
+	('Breaking Bad', 2008, 3030, 1, 9.5, 50000000);
+	
+create table cinema.genre_movie_show(
 	id serial primary key,
 	genre_id int references cinema.genres(id) not null,
-	movie_id int references cinema.movies(id) not null
+	movie_show_id int references cinema.movies(id) not null
 );
 
-insert into cinema.movie_genre(movie_id, genre_id)
+create or replace function cinema.return_movie_show_id(name varchar(255)) 
+returns int 
+as $$
+declare
+	inserted_id int;
+begin
+	inserted_id = (select id
+				   from cinema.movies
+				   where title = name
+				   union
+				   select id
+				   from cinema.tv_shows
+				   where title = name 
+				   );
+	return inserted_id;
+end; 
+$$
+language plpgsql;
+
+insert into cinema.genre_movie_show(movie_show_id, genre_id)
 values
-	(1,4),
-	(1,5),
-	(2,4),
-	(2,5),
-	(3,4),
-	(3,5),
-	(4,4),
-	(4,5),
-	(4,1),
-	(5,4),
-	(5,5),
-	(6,5),
-	(6,6),
-	(6,11),
-	(7,2),
-	(7,5),
-	(7,12),
-	(8,4),
-	(8,5),
-	(9,2),
-	(9,5),
-	(10,5),
-	(10,4),
-	(10,11),
-	(11,4),
-	(11,5),
-	(12,4),
-	(12,5),
-	(12,13),
-	(13,11),
-	(13,3),
-	(13,5),
-	(14,5),
-	(15,13),
-	(16,5),
-	(16,1),
-	(16,13);
+	(cinema.return_movie_show_id('The Shawshank Redemption'),4),
+	(cinema.return_movie_show_id('The Shawshank Redemption'),5),
+	(cinema.return_movie_show_id('The Godfather'),4),
+	(cinema.return_movie_show_id('The Godfather'),5),
+	(cinema.return_movie_show_id('The Godfather: Part II'),4),
+	(cinema.return_movie_show_id('The Godfather: Part II'),5),
+	(cinema.return_movie_show_id('The Dark Knight'),4),
+	(cinema.return_movie_show_id('The Dark Knight'),5),
+	(cinema.return_movie_show_id('The Dark Knight'),1),
+	(cinema.return_movie_show_id('12 Angry Men'),4),
+	(cinema.return_movie_show_id('12 Angry Men'),5),
+	(cinema.return_movie_show_id('Schindler''s List'),5),
+	(cinema.return_movie_show_id('Schindler''s List'),6),
+	(cinema.return_movie_show_id('Schindler''s List'),11),
+	(cinema.return_movie_show_id('The Lord of the Rings: The Return of the King'),2),
+	(cinema.return_movie_show_id('The Lord of the Rings: The Return of the King'),5),
+	(cinema.return_movie_show_id('The Lord of the Rings: The Return of the King'),12),
+	(cinema.return_movie_show_id('Pulp Fiction'),4),
+	(cinema.return_movie_show_id('Pulp Fiction'),5),
+	(cinema.return_movie_show_id('Seven Samurai'),2),
+	(cinema.return_movie_show_id('Seven Samurai'),5),
+	(cinema.return_movie_show_id('Goodfellas'),5),
+	(cinema.return_movie_show_id('Goodfellas'),4),
+	(cinema.return_movie_show_id('Goodfellas'),11),
+	(cinema.return_movie_show_id('City of God'),4),
+	(cinema.return_movie_show_id('City of God'),5),
+	(cinema.return_movie_show_id('Se7en'),4),
+	(cinema.return_movie_show_id('Se7en'),5),
+	(cinema.return_movie_show_id('Se7en'),13),
+	(cinema.return_movie_show_id('The Intouchables'),11),
+	(cinema.return_movie_show_id('The Intouchables'),3),
+	(cinema.return_movie_show_id('The Intouchables'),5),
+	(cinema.return_movie_show_id('Cinema Paradiso'),5),
+	(cinema.return_movie_show_id('The Lives of Others'),13),
+	(cinema.return_movie_show_id('Oldeuboi'),5),
+	(cinema.return_movie_show_id('Oldeuboi'),1),
+	(cinema.return_movie_show_id('Oldeuboi'),13),
+	(cinema.return_movie_show_id('Band of Brothers'),1),
+	(cinema.return_movie_show_id('Band of Brothers'),5),
+	(cinema.return_movie_show_id('Band of Brothers'),6),
+	(cinema.return_movie_show_id('Game of Thrones'),1),
+	(cinema.return_movie_show_id('Game of Thrones'),2),
+	(cinema.return_movie_show_id('Game of Thrones'),5),
+	(cinema.return_movie_show_id('Breaking Bad'),4),
+	(cinema.return_movie_show_id('Breaking Bad'),5),
+	(cinema.return_movie_show_id('Breaking Bad'),13);
 
 
 create or replace function cinema.insert_movie(movie varchar(255), year_ int, length_ int, country_id int,
@@ -120,7 +168,7 @@ create or replace function cinema.insert_movie(movie varchar(255), year_ int, le
 returns int 
 as $$
 declare
-a_id int;
+	a_id int;
 begin
 	insert into cinema.movies(title, year_of_release, length_in_minutes, country_id, imdb_rating, budget)
 	values(movie, year_, length_, country_id, rating, budget)
@@ -128,7 +176,7 @@ begin
 	return a_id;
 end; 
 $$
-language PLPGSQL;
+language plpgsql;
 
 create table cinema.log_table(
 	id serial primary key,
@@ -158,7 +206,7 @@ begin
 	return new;
 end; 
 $$
-language PLPGSQL;
+language plpgsql;
 
 create trigger new_movie_update
 after update or insert or delete
@@ -188,7 +236,7 @@ begin
 	return (select floor(random() * b + a)::int);
 end;
 $$ 
-language PLPGSQL strict;
+language plpgsql strict;
 
 create or replace function cinema.insert_random_record()
 returns void 
@@ -203,7 +251,7 @@ begin
 	values(id, m_id);
 end; 
 $$
-language PLPGSQL;
+language plpgsql;
 
 create table cinema.archive_user_activity(
 	user_id uuid not null,
@@ -213,18 +261,18 @@ create table cinema.archive_user_activity(
 
 update cinema.user_activity    ---------------to check whether CTE works in a proper way
 set created_date = '2018-04-03 12:34:07'
-where favourite_movie_id = 17;
+where favourite_movie_id = 15;
 
 
-WITH moved_rows AS (    ------------------------------------------CTE which moves old data(more than 3 days) from cinema.user_activity to cinema.archive_user_activity
-    DELETE FROM cinema.user_activity
-    WHERE
+with moved_rows as (    ------------------------------------------CTE which moves old data(more than 3 days) from cinema.user_activity to cinema.archive_user_activity
+    delete from cinema.user_activity
+    where
         cast(created_date as date) < current_date - int '3'
-    RETURNING *
+    returning *
 )
-INSERT INTO cinema.archive_user_activity (user_id, favourite_movie_id, created_date)
-SELECT * 
-FROM moved_rows;
+insert into cinema.archive_user_activity (user_id, favourite_movie_id, created_date)
+select * 
+from moved_rows;
 
 
 create or replace function cinema.loop_insert_random_record(n int)
@@ -239,9 +287,9 @@ begin
 	return;
 end; 
 $$
-language PLPGSQL;
+language plpgsql;
 
-select cinema.loop_insert_random_record(1000) ---------------- this function inserts 1000 rows in cinema.user_activity
+select cinema.loop_insert_random_record(1000); ---------------- this function inserts 1000 rows in cinema.user_activity
 
 
 create view cinema.movie_and_genre as                   --------------- this view selects columns from 4 joined tables
@@ -252,10 +300,9 @@ select m.id,
 	g.genre 
 from cinema.movies m
 inner join cinema.country c on m.country_id = c.id
-inner join cinema.movie_genre fg on fg.movie_id= m.id
-inner join cinema.genres g on fg.genre_id = g.id;
+inner join cinema.genre_movie_show gms on gms.movie_show_id= m.id
+inner join cinema.genres g on gms.genre_id = g.id;
 
-select * from cinema.movie_and_genre;
 
 create materialized view cinema.country_movie
 as
@@ -273,11 +320,11 @@ refresh materialized view concurrently cinema.country_movie;
 ----------------------------------------------------- SELECTS-----------------------------------------
 select cinema.insert_movie('Dangal', 2016, 161, 8, 8.5, 10500000); -- function inserts new movie in the table "Cinems".Movie and returns this movie's ID;
 
-insert into cinema.movie_genre(movie_id, genre_id) -- we insert movie and genres to which it belongs into table cinema.movie_genre;
+insert into cinema.genre_movie_show(movie_show_id, genre_id) -- we insert movie and genres to which it belongs into table cinema.genre_movie_show;
 values
-	(17,1),
-	(17,5),
-	(17,11);
+	(select cinema.return_movie_show_id('Dangal'),1),
+	(select cinema.return_movie_show_id('Dangal'),5),
+	(select cinema.return_movie_show_id('Dangal'),11);
 
 select * 
 from cinema.log_table; -- trigger reacted on insert command and logged changes into table cinema.log_table;
@@ -285,8 +332,8 @@ from cinema.log_table; -- trigger reacted on insert command and logged changes i
 
 select g.genre, count(m.id) as amount          ------------ this select joins 3 tables to find genre and group movie's id by genre (with additional condition)
 from cinema.movies m 
-inner join cinema.movie_genre f on m.id = f.movie_id
-inner join cinema.genres g on f.genre_id = g.id
+inner join cinema.genre_movie_show gms on m.id = gms.movie_show_id
+inner join cinema.genres g on gms.genre_id = g.id
 group by g.genre
 having count(m.id) > 2;
 
